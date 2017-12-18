@@ -1,0 +1,285 @@
+<html>
+<h4>Esker - VIE/76338/2172015<br>
+August 3rd 2015<br><br>
+Sybile NIVON<br>
+<a href="mailto:sybile.nivon@gmail.com"> sybile.nivon@gmail.com </a><br>
+06 67 32 35 30<br>
+<br>
+<i>Please choose a .txt file using the following button and a report will be generated in a pop-up.<br>
+You may need to allow pop-ups in your browser's parameters.</i>
+</h4>
+<i>This program has been tested on Firefox and Google Chrome.</i><br>
+<i>This has treated a 100Mo text file in 05:35 min.</i>
+<br><br><br><br>
+
+<input id="file" type="file" />
+
+<script>
+
+var fileInput = document.querySelector('#file');
+
+// When a file is chosen, the function is executed
+document.querySelector('#file').addEventListener('change', function() {
+	do_it();
+	}, false);
+
+function do_it () {
+    var reader = new FileReader();
+    reader.readAsText(fileInput.files[0]);
+	//Now, reader.result is a string representing everything written in the file
+
+
+	var nb_lines = 0; 
+	var nb_car = 0;
+	var nb_let = 0;
+	var nb_number = 0;
+	var nb_fig = 0;
+	var nb_oth = 0;
+	var nb_words = 0;
+	var nb_one = 0;
+	var nb_two = 0;
+	var nb_sixteen = 0;
+	var nb_nineteen = 0;
+	
+	
+	function count_lines(){ 						//count the lines
+		var i=0;
+		//We count the lines only if there is at least one character
+		if (reader.result.length>0){
+			//This corresponds to the first line
+			nb_lines++;
+			while (i<=reader.result.length){
+				// We increment the number of lines everytime there is a line breack
+				if (reader.result.charAt(i)=="\n"){
+					nb_lines+=1;
+					}
+				i++;
+			}
+		}
+		return nb_lines;
+	}
+
+	function count_characters(){ 					//count the characters (everything without the spaces)
+		var i = 0;
+		if (reader.result.length>0){
+			//Until we have finished to check all of the elements of the file
+			while (i<=reader.result.length){
+				//We increment the number of characters everytime we have a character
+				if (reader.result.charAt(i).match(/\S/)){
+					nb_car ++;
+				}
+				i++;
+			}
+		}
+		return nb_car;
+	}
+	
+	function count_letters() { 						//count the letters (from a to z)
+		var i = 0;
+		if (reader.result.length>0){
+			while (i<=reader.result.length){
+				//We increment the number of letters everytime we have a regular letter of the alphabet: from a to z or A to Z
+				if (reader.result.charAt(i).match(/[a-zA-Z]/)){
+					nb_let ++;
+				}
+				i++;
+			}
+		}
+		return nb_let;
+	}
+	
+	function count_figures() { 						//count the figures
+		var i = 0;
+		if (reader.result.length>0){
+			while (i<=reader.result.length){
+				//We increment the number of figures everytime we have a number
+				if (reader.result.charAt(i).match(/[0-9]/)){
+					nb_fig ++;
+				}
+				i++;
+			}
+		}
+		return nb_fig;
+	}
+	
+	function count_other() { 						//count the rest of the characters	
+		//"other" characters represent the rest of the characters
+		var nb_oth = nb_car - nb_let - nb_fig;
+		return nb_oth;
+	}
+	
+	function count_words(){ 						//count the words
+		var j = 0;
+		//We count the words only if there is at least one character
+		if (nb_car>0){
+			//if there is a character, it means that we have a first word:
+			nb_words++;
+			while (j<=reader.result.length){
+
+				//and then, every space or any space character increments the number of words
+				if ((reader.result.charAt(j).match(/\s/))||(reader.result.charAt(j).match(/\'/))){
+					nb_words++;
+				}
+
+				j++;
+
+			}
+			//each line breack represents two characters so two space characters so we delete them: -nb_line+1
+			nb_words = nb_words - nb_lines+1;
+
+			//Then we have to count the last word if the last character is a character: +1
+			if (reader.result.charAt(reader.result.length).match(/\S/)){
+				nb_words = nb_words + 1;	
+			}
+			
+		}
+		return nb_words;
+		
+	}
+	
+	function count_one(){							//count the words with one letter
+		var i = 0;
+		if (reader.result.length>0){
+		
+			//we need to check if the first word is a one-letter word.
+			var str0 = (reader.result.charAt(0)).concat(reader.result.charAt(1));
+			if ((str0.match(/^\S+\s$/))||(str0.match(/^\S+\'$/))||(str0.match(/^\'+\S$/))){
+					nb_one ++;
+			}
+
+			//we check if we have this configuration: " a " or "'a " or " a'"
+			//then "I'm" are two one-letter words
+			while (i<=reader.result.length-2){
+				var str1 = (reader.result.charAt(i)).concat(reader.result.charAt(i+1), reader.result.charAt(i+2));
+				if ((str1.match(/^\s+\S+\s$/))||(str1.match(/^\s+\S+\'$/))||(str1.match(/^\'+\S+\s$/))){
+					nb_one ++;
+				}			
+				i++;
+			}
+			
+			
+			// to finish, we need to check if the last word is a one-letter word.
+			var str2 = (reader.result.charAt(reader.result.length-2)).concat(reader.result.charAt(reader.result.length-1));
+			if ((str2.match(/^\s+\S$/))||(str1.match(/^\S+\'$/))||(str1.match(/^\'+\S$/))){
+					nb_one ++;
+			}	
+		}
+		return nb_one;
+	}
+
+	function count_two(){ 							//count the words with two letters
+		var i = 0;
+		if (reader.result.length>0){
+		
+			//We check the first word
+			var str2 = (reader.result.charAt(reader.result.length-2)).concat(reader.result.charAt(reader.result.length-1),reader.result.charAt(reader.result.length));
+			if (str2.match(/^\S+\S+\s$/)){
+					nb_two ++;
+			}	
+
+			//we check if we have this configuration: " aa " or "'aa " or " aa'"
+			//then "We'll" are two two-letter words
+			while (i<=reader.result.length-3){
+				var str1 = (reader.result.charAt(i)).concat(reader.result.charAt(i+1), reader.result.charAt(i+2),reader.result.charAt(i+3));
+				if ((str1.match(/^\s+\S+\S+\s$/))||(str1.match(/^\'+\S+\S+\s$/))||(str1.match(/^\s+\S+\S+\'$/))){
+					nb_two ++;
+				}
+				i++;
+			}
+			//We check the last word
+			var str2 = (reader.result.charAt(reader.result.length-2)).concat(reader.result.charAt(reader.result.length-1),reader.result.charAt(reader.result.length));
+			if (str2.match(/^\s+\S+\S$/)){
+					nb_two ++;
+			}	
+		}
+		return nb_two;
+	}
+	
+	function count_sixteen(){ 						//count the words with sixteen letters
+		var i = 0;
+		if (reader.result.length>0){
+
+			while (i<=reader.result.length){
+				var j = 0; // number of following letters
+				while (j<=16){
+					if (j == 16){
+						//if 16 following letters, check if the 17th is a space character or the end of the file
+						if ((reader.result.charAt(i).match(/^\s$/))||(i==reader.result.length)){
+							nb_sixteen ++;
+						}
+						//change the value of "j" to quit the "while"
+						j = 18;
+					}
+					
+					//if the following character is not a '
+					else if (reader.result.charAt(i).match(/^\'$/)){
+						j = 18;
+					}
+
+					//if the following character is not a space
+					else if (reader.result.charAt(i).match(/^\S$/)){
+						j++; //we increment the number of letters in this word
+					}
+					else {
+						j = 18;
+					}
+					i++; //we check the following character
+				}
+			}
+		}
+		return nb_sixteen;
+	}
+	
+	function count_nineteen(){ 						//count the words with nineteen letters
+		var i = 0;
+		if (reader.result.length>0){
+
+			while (i<=reader.result.length){
+				var j = 0;
+					while (j<=19){
+						if (j == 19){
+							if ((reader.result.charAt(i).match(/^\s$/))||(i==reader.result.length)){
+							nb_nineteen ++;
+							}
+						j = 23;
+					}
+					
+					else if (reader.result.charAt(i).match(/^\'$/)){
+						j = 23;
+					}
+
+
+					else if (reader.result.charAt(i).match(/^\S$/)){
+						j++;
+					}
+					else {
+						j = 23;
+					}
+					i++;
+				}
+			}
+		}
+		return nb_nineteen;
+	}
+	
+    reader.addEventListener('load', function() { 	//is launched when the file is chosen and gives the information in a pop-up
+		var str = ('File name: "'+ fileInput.files[0].name + '" :\n Number of lines: '
+		+ count_lines() + ' \n Number of characters (total): '
+		+ count_characters () + ' \n Number of letters: '
+		+ count_letters() + ' \n Number of figures: '
+		+ count_figures() + ' \n Number of other characters: '
+		+ count_other() + ' \n Number of words: '
+		+ count_words() + ' \n Number of 1 letter words: '
+		+ count_one()  + ' \n Number of 2 letters words: '
+		+ count_two() + ' \n Number of 16 letters words: '
+		+ count_sixteen() + ' \n Number of 19 letters words: '
+		+ count_nineteen());
+		alert("Here is your file's information:\n" + str);
+		}, false);
+
+}
+
+
+</script>
+
+</html>
