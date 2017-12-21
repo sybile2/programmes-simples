@@ -1,7 +1,7 @@
 # donne un nombre en binaire
 import math
 
-n = 1024
+n = 999
 i = 0
 k = math.floor(math.log(n) / math.log(2))
 tab = []
